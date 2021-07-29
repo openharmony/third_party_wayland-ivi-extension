@@ -119,8 +119,7 @@ registry_handle_client(void *data, struct wl_registry *registry,
 }
 
 static void
-registry_handle_client_remove(__unused void *data, __unused struct wl_registry *registry,
-__unused	      uint32_t name)
+registry_handle_client_remove(void *data, struct wl_registry *registry, uint32_t name)
 {
 }
 

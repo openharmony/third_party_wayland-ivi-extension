@@ -2664,8 +2664,8 @@ ilm_commitChanges(void)
     lock_context(ctx);
     if (ctx->wl.controller) {
         ivi_wm_commit_changes(ctx->wl.controller);
-
-        if (wl_display_roundtrip_queue(ctx->wl.display, ctx->wl.queue) != -1)
+        wl_display_flush(ctx->wl.display);
+        if (wl_display_flush (ctx->wl.display) != -1)
         {
             returnValue = ILM_SUCCESS;
         }

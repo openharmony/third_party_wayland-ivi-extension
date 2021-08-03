@@ -101,6 +101,11 @@ screen_listener_t screen_info_property_change_callback_listener = NULL;
 static int
 check_surface_id(struct wl_client *client, uint32_t surface_id)
 {
+    //for dummy output screen debug(USE_DUMMY_SCREEN)
+#ifdef USE_DUMMY_SCREEN
+    return 0;
+#endif
+
     pid_t pid;
     const int windowIdBitNum = 5;
 
@@ -1504,9 +1509,46 @@ controller_create_screen(struct wl_client *client,
     }
 }
 
+//for dummy output screen(USE_DUMMY_SCREEN)
+static void
+controller_create_screen2(struct wl_client *client,
+                        struct wl_resource *resource,
+                        uint32_t screen_id,
+                        uint32_t id)
+{
+    struct wl_resource *screen_resource;
+    struct ivicontroller *ctrl = wl_resource_get_user_data(resource);
+    struct iviscreen* iviscrn = NULL;
+    weston_log("######controller_create_screen2: screen_id = %d\n", screen_id);
+
+    wl_list_for_each(iviscrn, &ctrl->shell->list_screen, link) {
+        weston_log("######controller_create_screen2: iviscrn->id_screen = %d\n", iviscrn->id_screen);
+        if (screen_id != iviscrn->id_screen) {
+            continue;
+        }
+
+        screen_resource = wl_resource_create(client, &ivi_wm_screen_interface, 1, id);
+        if (screen_resource == NULL) {
+            wl_resource_post_no_memory(resource);
+            return;
+        }
+
+        wl_resource_set_implementation(screen_resource,
+                                       &controller_screen_implementation,
+                                       iviscrn, destroy_ivicontroller_screen);
+
+        wl_list_insert(&iviscrn->resource_list, wl_resource_get_link(screen_resource));
+
+        ivi_wm_screen_send_screen_id(screen_resource, iviscrn->id_screen);
+        ivi_wm_screen_send_connector_name(screen_resource, iviscrn->output->name);
+    }
+}
+
 static const struct ivi_wm_interface controller_implementation = {
     controller_commit_changes,
     controller_create_screen,
+    //for dummy output screen(USE_DUMMY_SCREEN)
+    controller_create_screen2,
     controller_set_surface_visibility,
     controller_set_layer_visibility,
     controller_set_surface_opacity,
@@ -2159,6 +2201,10 @@ init_ivi_shell(struct weston_compositor *ec, struct ivishell *shell)
 
     wl_list_for_each(output, &ec->output_list, link)
         create_screen(shell, output);
+#ifdef USE_DUMMY_SCREEN
+    output = lyt->get_dummy_output();
+    create_screen(shell, output);
+#endif /* USE_DUMMY_SCREEN */
 
     ret = check_layout_layers(shell);
     if (ret != 0) {

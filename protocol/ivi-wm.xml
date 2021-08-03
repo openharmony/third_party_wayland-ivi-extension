@@ -175,6 +175,14 @@
       <arg name="id" type="new_id" interface="ivi_wm_screen" summary="the new ivi-screen"/>
     </request>
 
+    <request name="create_screen2">
+      <description summary="create a screen in ivi-compositor">
+        Ask the ivi-wm to create a ivi-screen for given wl_output.
+      </description>
+      <arg name="screen_id" type="uint"/>
+      <arg name="id" type="new_id" interface="ivi_wm_screen" summary="the new ivi-screen"/>
+    </request>
+
     <request name="set_surface_visibility">
       <description summary="set the visibility of a surface in ivi compositor">
         If visibility argument is 0, the surface in the ivi compositor is set to invisible.

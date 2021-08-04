@@ -38,6 +38,8 @@
 #include "ivi-wm-client-protocol.h"
 #include "ivi-input-client-protocol.h"
 
+// #define USE_DUMMY_SCREEN
+
 struct layer_context {
     struct wl_list link;
 
@@ -1337,13 +1339,50 @@ init_control(void)
         return -1;
     }
 
+#ifdef USE_DUMMY_SCREEN
+    ctx_scrn = calloc(1, sizeof *ctx_scrn);
+    if (ctx_scrn == NULL) {
+        fprintf(stderr, "Failed to allocate memory for screen_context\n");
+        return -1;
+    }
+    ctx_scrn->ctx = wl;
+    wl_list_insert(&wl->list_screen, &ctx_scrn->link);
+
     wl_list_for_each(ctx_scrn, &ctx->wl.list_screen, link) {
         if (!ctx_scrn->controller) {
-            ctx_scrn->controller = ivi_wm_create_screen(wl->controller, ctx_scrn->output);
-            ivi_wm_screen_add_listener(ctx_scrn->controller, &wm_screen_listener,
+            if (ctx_scrn->output) {
+                printf("for dummy output screen, output = !NULL\n");
+                ctx_scrn->controller = ivi_wm_create_screen(wl->controller, ctx_scrn->output);
+                ivi_wm_screen_add_listener(ctx_scrn->controller, &wm_screen_listener,
                                        ctx_scrn);
+            }
+            else {
+                printf("for dummy output screen, output = NULL\n");
+                //for dummy output screen.
+                ctx_scrn->controller = ivi_wm_create_screen2(wl->controller, 1);
+                ivi_wm_screen_add_listener(ctx_scrn->controller, &wm_screen_listener,
+                                        ctx_scrn);
+                ctx_scrn->prop.screenWidth = 240;
+                ctx_scrn->prop.screenHeight = 480;
+            }
+        }
+
+        // get screen-ids
+        if (wl_display_roundtrip_queue(wl->display, wl->queue) == -1)
+        {
+            fprintf(stderr, "Failed to do roundtrip queue: %s\n", strerror(errno));
+            return -1;
         }
     }
+#else
+     wl_list_for_each(ctx_scrn, &ctx->wl.list_screen, link) {
+         if (!ctx_scrn->controller) {
+             ctx_scrn->controller = ivi_wm_create_screen(wl->controller, ctx_scrn->output);
+                ivi_wm_screen_add_listener(ctx_scrn->controller, &wm_screen_listener,
+                                       ctx_scrn);
+         }
+     }
+#endif
 
     // get screen-ids
     if (wl_display_roundtrip_queue(wl->display, wl->queue) == -1)

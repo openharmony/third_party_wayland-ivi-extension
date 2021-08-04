@@ -35,6 +35,7 @@
 #include "ivi-input-server-protocol.h"
 #include "ivi-controller.h"
 #include "libweston-internal.h"
+#include "ivi-input-export.h"
 
 struct seat_ctx {
     struct input_context *input_ctx;
@@ -92,6 +93,13 @@ struct wl_keyboard_data {
     uint32_t group;
     uint32_t serial;
 };
+
+static struct input_context *g_ctx = {0};
+struct input_context *
+get_instance(void)
+{
+    return &g_ctx;
+}
 
 static struct seat_focus *
 get_accepted_seat(struct ivisurface *surface, struct seat_ctx *seat_ctx)
@@ -1087,6 +1095,15 @@ setup_input_focus(struct input_context *ctx, uint32_t surface,
 }
 
 static void
+set_focus(uint32_t surface, uint32_t device, int32_t enabled)
+{
+    weston_log("%{public}s surface: %{public}d device: %{public}d enabled: %{public}d",
+        __FUNCTION__, surface, device, enabled);
+    setup_input_focus(get_instance(), surface, device, enabled);
+    weston_log("%{public}s end.", __FUNCTION__);
+}
+
+static void
 input_set_input_focus(struct wl_client *client,
                                  struct wl_resource *resource,
                                  uint32_t surface, uint32_t device,
@@ -1300,14 +1317,8 @@ input_controller_destroy(struct wl_listener *listener, void *data)
 static struct input_context *
 create_input_context(struct ivishell *shell)
 {
-    struct input_context *ctx = NULL;
+    struct input_context *ctx = get_instance();
     struct weston_seat *seat;
-    ctx = calloc(1, sizeof *ctx);
-    if (ctx == NULL) {
-        weston_log("%s: Failed to allocate memory for input context\n",
-                   __FUNCTION__);
-        return NULL;
-    }
 
     ctx->ivishell = shell;
     wl_list_init(&ctx->resource_list);
@@ -1332,7 +1343,6 @@ create_input_context(struct ivishell *shell)
 
     return ctx;
 }
-
 
 static int
 input_controller_init(struct ivishell *shell)
@@ -1377,6 +1387,10 @@ input_controller_init(struct ivishell *shell)
     return ret;
 }
 
+static struct ivi_input_interface_for_wms ivi_input_interface_for_wms = {
+    .set_focus = set_focus,
+};
+
 WL_EXPORT int
 input_controller_module_init(struct ivishell *shell)
 {
@@ -1388,6 +1402,11 @@ input_controller_module_init(struct ivishell *shell)
         if (ret >= 0)
             weston_log("ivi-input-controller module loaded successfully!\n");
     }
+
+    weston_plugin_api_register(shell->compositor,
+        IVI_INPUT_API_NAME_FOR_WMS,
+        &ivi_input_interface_for_wms,
+        sizeof(struct ivi_input_interface_for_wms));
     return ret;
 }
 

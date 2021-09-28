@@ -62,10 +62,21 @@ Note:If the text contains special characters, please escape them according to th
                 <filteritem type="filename" name="README.OpenSource"/>
                 <filteritem type="filename" name="README"/>
                 <filteritem type="filename" name="sources.txt"  desc="not used in ohos"/>
+                <filteritem type="filename" name="ivi-input-controller.c"  desc="no problem license"/>
+                <filteritem type="filename" name="bitmap.c"  desc="no problem license"/>
+                <filteritem type="filename" name="simple-weston-client.c"  desc="no problem "/>
+                <filteritem type="filename" name="bitmap.h"  desc="no problem license"/>
+                <filteritem type="filename" name="ivi-id-agent.c"  desc="no problem license"/>
+                <filteritem type="filename" name="layer-add-surfaces.c"  desc="no problem license"/>
+                <filteritem type="filename" name="ivi-controller.c"  desc="no problem license"/>
+                <filteritem type="filename" name="ivi-controller.h"  desc="no problem license"/>
             </filefilter>
             <filefilter name="copyrightPolicyFilter" desc="Filters for copyright header policies" >
                 <filteritem type="filename" name="README.OpenSource"/>
                 <filteritem type="filename" name="README"/>
+            </filefilter>
+            <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies">
+	            <filteritem type="filename" name="*.bmp|*.png|*.jpg" desc="binary not used and belonged to wayland-ivi-exteion"/>
             </filefilter>
         </filefilterlist>
     </oatconfig>

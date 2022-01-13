@@ -1,0 +1,42 @@
+{
+    "name": "@ohos/wayland_ivi_extension",
+    "version": "",
+    "description": "Third-party open-source software wayland-ivi-extension | 三方开源软件wayland-ivi-extension",
+    "homePage": "https://gitee.com/openharmony",
+    "license": "Apache V2",
+    "repository": "https://gitee.com/openharmony/third_party_wayland-ivi-extension",
+    "domain": "os",
+    "language": "",
+    "publishAs": "code-segment",
+    "private": false,
+    "scripts": {},
+    "tags": [
+        "third_party"
+    ],
+    "keywords": [
+        "third-party",
+        "wayland-ivi-extension"
+    ],
+    "envs": {},
+    "dirs": {},
+    "readmePath": {
+        "en": "README"
+    },
+    "segment": {
+        "destPath": "third_party/wayland-ivi-extension"
+    },
+    "component": {
+        "name": "thirdparty_wayland-ivi-extension",
+        "subsystem": "",
+        "syscap": [],
+        "features": [],
+        "adapted_system_type": [],
+        "rom": "",
+        "ram": "",
+        "build": {
+            "sub_component": [],
+            "inner_kits": [],
+            "test": []
+        }
+    }
+}

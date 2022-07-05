@@ -94,7 +94,7 @@ struct wl_keyboard_data {
     uint32_t serial;
 };
 
-static struct input_context *g_ctx = {0};
+static struct input_context g_ctx = {0};
 struct input_context *
 get_instance(void)
 {
